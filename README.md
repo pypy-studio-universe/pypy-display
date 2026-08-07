@@ -8,6 +8,8 @@
 
 A minimal macOS menu bar app for managing your displays.
 
+<p align="center"><em>English below ↓</em></p>
+
 <p align="center">
   <img src="Assets/Screenshots/PypyDisplay-menu.png" alt="PypyDisplay menu bar interface" width="420">
 </p>
