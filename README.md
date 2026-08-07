@@ -1,4 +1,8 @@
-# PypyDisplay
+<p align="center">
+  <img src="Assets/PypyDisplay-AppIcon-1024-alpha.png" alt="PypyDisplay logo" width="160">
+</p>
+
+<h1 align="center">PypyDisplay</h1>
 
 Ứng dụng menu bar tối giản để quản lý màn hình trên macOS.
 
