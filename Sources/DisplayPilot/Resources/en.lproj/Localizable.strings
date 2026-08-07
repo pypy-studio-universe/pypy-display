@@ -1,0 +1,55 @@
+"display.none" = "No displays found";
+"display.scan_again" = "PypyDisplay will scan again in a few seconds.";
+"display.rescan" = "Rescan displays";
+"display.awake" = "Displays awake";
+"display.connected_count" = "%d/%d displays connected";
+"display.kind.built_in" = "Built-in";
+"display.kind.external" = "External";
+"display.unknown_resolution" = "Unknown resolution";
+"display.connection_toggle" = "Connection for %@";
+"display.disconnect" = "Disconnect %@";
+"display.connect" = "Connect %@";
+"display.last_active_help" = "At least one display must remain connected.";
+"display.master_description" = "Turn off to sleep all displays without disconnecting them. Press any key, move the pointer, or use %@ to wake.";
+
+"connection.title" = "Connection management";
+"connection.auto_disconnect_built_in" = "Auto-disconnect built-in display";
+"connection.auto_disconnect_description" = "Apple Silicon only. Use the switches above to connect or disconnect any display. This option automatically disconnects the built-in display when an external display becomes active.";
+
+"settings.resolution" = "Resolution";
+"settings.brightness" = "Brightness";
+"settings.software_brightness" = "Brightness (software)";
+"settings.brightness_unavailable" = "Not supported";
+"settings.eye_protection" = "Eye protection";
+"settings.eye_protection_help" = "Reduces blue light on this display with a warmer color profile.";
+"settings.true_tone" = "True Tone";
+"settings.true_tone_help" = "Uses the Mac ambient-light sensors to adapt the built-in display.";
+"settings.true_tone_unavailable" = "Not supported";
+
+"action.quit" = "Quit";
+"language.label" = "Language";
+"language.vietnamese" = "Vietnamese";
+"language.english" = "English";
+"author.label" = "Author";
+
+"error.sleep_launch" = "Could not start display sleep: %@";
+"error.sleep_failed" = "Display sleep failed (exit %d): %@";
+"error.wake_failed" = "Could not wake the displays (IOReturn %d).";
+"error.connection_api_unavailable" = "Display connection management is unavailable on this macOS version.";
+"error.requires_apple_silicon" = "Display connection management requires Apple Silicon.";
+"error.last_display" = "At least one display must remain connected.";
+"error.connection_begin" = "Could not begin the display connection change (CGError %d).";
+"error.connection_configure" = "Could not change the display connection (CGError %d).";
+"error.connection_complete" = "macOS could not complete the display connection change (CGError %d).";
+"error.mode_unavailable" = "The selected resolution is no longer available.";
+"error.resolution_begin" = "Could not begin the resolution change (CGError %d).";
+"error.resolution_configure" = "Could not configure the selected resolution (CGError %d).";
+"error.resolution_complete" = "macOS could not complete the resolution change (CGError %d).";
+"error.brightness_unavailable" = "Brightness control is unavailable for this display.";
+"error.brightness_read" = "Could not read display brightness (error %d).";
+"error.brightness_set" = "Could not change display brightness (error %d).";
+"error.brightness_ddc_set" = "The external display did not accept the DDC/CI brightness command.";
+"error.gamma_read" = "Could not prepare the display color adjustment (CGError %d).";
+"error.gamma_set" = "Could not apply the display color adjustment (CGError %d).";
+"error.true_tone_unavailable" = "True Tone is unavailable for the built-in display.";
+"error.true_tone_set" = "macOS did not accept the True Tone change.";

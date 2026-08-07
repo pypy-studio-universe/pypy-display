@@ -1,0 +1,55 @@
+"display.none" = "Không tìm thấy màn hình";
+"display.scan_again" = "PypyDisplay sẽ tự quét lại sau vài giây.";
+"display.rescan" = "Quét lại màn hình";
+"display.awake" = "Màn hình đang bật";
+"display.connected_count" = "%d/%d màn hình đang kết nối";
+"display.kind.built_in" = "Tích hợp";
+"display.kind.external" = "Màn hình ngoài";
+"display.unknown_resolution" = "Không rõ độ phân giải";
+"display.connection_toggle" = "Kết nối cho %@";
+"display.disconnect" = "Ngắt kết nối %@";
+"display.connect" = "Kết nối %@";
+"display.last_active_help" = "Phải luôn giữ ít nhất một màn hình được kết nối.";
+"display.master_description" = "Tắt để cho tất cả màn hình ngủ mà không ngắt kết nối. Nhấn phím bất kỳ, di chuyển chuột hoặc dùng %@ để đánh thức.";
+
+"connection.title" = "Quản lý kết nối";
+"connection.auto_disconnect_built_in" = "Tự ngắt màn hình tích hợp";
+"connection.auto_disconnect_description" = "Chỉ dành cho Apple Silicon. Dùng các công tắc phía trên để kết nối hoặc ngắt bất kỳ màn hình nào. Tùy chọn này tự ngắt màn hình tích hợp khi màn hình ngoài hoạt động.";
+
+"settings.resolution" = "Độ phân giải";
+"settings.brightness" = "Độ sáng";
+"settings.software_brightness" = "Độ sáng (phần mềm)";
+"settings.brightness_unavailable" = "Không hỗ trợ";
+"settings.eye_protection" = "Bảo vệ mắt";
+"settings.eye_protection_help" = "Giảm ánh sáng xanh trên màn hình này bằng tông màu ấm hơn.";
+"settings.true_tone" = "True Tone";
+"settings.true_tone_help" = "Dùng cảm biến ánh sáng của máy Mac để tự điều chỉnh màn hình tích hợp.";
+"settings.true_tone_unavailable" = "Không hỗ trợ";
+
+"action.quit" = "Thoát";
+"language.label" = "Ngôn ngữ";
+"language.vietnamese" = "Tiếng Việt";
+"language.english" = "English";
+"author.label" = "Tác giả";
+
+"error.sleep_launch" = "Không thể bắt đầu chế độ ngủ màn hình: %@";
+"error.sleep_failed" = "Không thể cho màn hình ngủ (mã thoát %d): %@";
+"error.wake_failed" = "Không thể đánh thức màn hình (IOReturn %d).";
+"error.connection_api_unavailable" = "Quản lý kết nối màn hình không khả dụng trên phiên bản macOS này.";
+"error.requires_apple_silicon" = "Quản lý kết nối màn hình yêu cầu Apple Silicon.";
+"error.last_display" = "Phải luôn giữ ít nhất một màn hình được kết nối.";
+"error.connection_begin" = "Không thể bắt đầu thay đổi kết nối màn hình (CGError %d).";
+"error.connection_configure" = "Không thể thay đổi kết nối màn hình (CGError %d).";
+"error.connection_complete" = "macOS không thể hoàn tất thay đổi kết nối màn hình (CGError %d).";
+"error.mode_unavailable" = "Độ phân giải đã chọn không còn khả dụng.";
+"error.resolution_begin" = "Không thể bắt đầu thay đổi độ phân giải (CGError %d).";
+"error.resolution_configure" = "Không thể cấu hình độ phân giải đã chọn (CGError %d).";
+"error.resolution_complete" = "macOS không thể hoàn tất thay đổi độ phân giải (CGError %d).";
+"error.brightness_unavailable" = "Không thể điều khiển độ sáng của màn hình này.";
+"error.brightness_read" = "Không thể đọc độ sáng màn hình (lỗi %d).";
+"error.brightness_set" = "Không thể thay đổi độ sáng màn hình (lỗi %d).";
+"error.brightness_ddc_set" = "Màn hình ngoài không chấp nhận lệnh độ sáng DDC/CI.";
+"error.gamma_read" = "Không thể chuẩn bị điều chỉnh màu màn hình (CGError %d).";
+"error.gamma_set" = "Không thể áp dụng điều chỉnh màu màn hình (CGError %d).";
+"error.true_tone_unavailable" = "True Tone không khả dụng cho màn hình tích hợp.";
+"error.true_tone_set" = "macOS không chấp nhận thay đổi True Tone.";
