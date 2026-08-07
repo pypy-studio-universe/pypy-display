@@ -27,7 +27,7 @@ PypyDisplay giúp bạn quản lý nhanh màn hình tích hợp và màn hình n
 
 ### Cài đặt
 
-1. Tải file `PypyDisplay.dmg` từ mục **Releases**.
+1. [Tải PypyDisplay.dmg](https://github.com/pypy-studio-universe/pypy-display/releases/latest/download/PypyDisplay-0.9.1-arm64.dmg).
 2. Mở file DMG và kéo **PypyDisplay** vào **Applications**.
 3. Mở ứng dụng và chọn **Open** nếu macOS yêu cầu xác nhận.
 
@@ -60,7 +60,7 @@ PypyDisplay lets you quickly manage built-in and external displays directly from
 
 ### Installation
 
-1. Download `PypyDisplay.dmg` from **Releases**.
+1. [Download PypyDisplay.dmg](https://github.com/pypy-studio-universe/pypy-display/releases/latest/download/PypyDisplay-0.9.1-arm64.dmg).
 2. Open the DMG and drag **PypyDisplay** into **Applications**.
 3. Launch the app and select **Open** if macOS requests confirmation.
 
