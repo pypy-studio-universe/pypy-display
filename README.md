@@ -27,6 +27,7 @@ PypyDisplay giúp bạn quản lý nhanh màn hình tích hợp và màn hình n
 - Bật hoặc cho toàn bộ màn hình ngủ mà không thay đổi bố cục.
 - Kết nối hoặc ngắt kết nối từng màn hình.
 - Tự ngắt màn hình tích hợp khi kết nối màn hình ngoài.
+- Tự kết nối lại màn hình tích hợp khi màn hình ngoài cuối cùng bị tháo.
 - Thay đổi độ phân giải và độ sáng từng màn hình.
 - Chế độ bảo vệ mắt riêng cho từng màn hình.
 - Điều khiển True Tone cho màn hình tích hợp.
@@ -35,7 +36,7 @@ PypyDisplay giúp bạn quản lý nhanh màn hình tích hợp và màn hình n
 
 ### Cài đặt
 
-1. [Tải PypyDisplay.dmg](https://github.com/pypy-studio-universe/pypy-display/releases/latest/download/PypyDisplay-0.9.1-arm64.dmg).
+1. [Tải PypyDisplay.dmg](https://github.com/pypy-studio-universe/pypy-display/releases/latest/download/PypyDisplay-0.9.2-arm64.dmg).
 2. Mở file DMG và kéo **PypyDisplay** vào **Applications**.
 3. Mở ứng dụng và chọn **Open** nếu macOS yêu cầu xác nhận.
 
@@ -60,6 +61,7 @@ PypyDisplay lets you quickly manage built-in and external displays directly from
 - Sleep or wake all displays without changing the layout.
 - Connect or disconnect individual displays.
 - Automatically disconnect the built-in display when an external display is connected.
+- Automatically reconnect the built-in display when the last external display is removed.
 - Change resolution and brightness for each display.
 - Per-display eye protection mode.
 - True Tone control for the built-in display.
@@ -68,7 +70,7 @@ PypyDisplay lets you quickly manage built-in and external displays directly from
 
 ### Installation
 
-1. [Download PypyDisplay.dmg](https://github.com/pypy-studio-universe/pypy-display/releases/latest/download/PypyDisplay-0.9.1-arm64.dmg).
+1. [Download PypyDisplay.dmg](https://github.com/pypy-studio-universe/pypy-display/releases/latest/download/PypyDisplay-0.9.2-arm64.dmg).
 2. Open the DMG and drag **PypyDisplay** into **Applications**.
 3. Launch the app and select **Open** if macOS requests confirmation.
 

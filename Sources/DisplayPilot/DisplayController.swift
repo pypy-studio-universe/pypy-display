@@ -2,6 +2,19 @@ import AppKit
 import CoreGraphics
 import Foundation
 
+private func pypyDisplayReconfigurationCallback(
+    displayID: CGDirectDisplayID,
+    flags: CGDisplayChangeSummaryFlags,
+    userInfo: UnsafeMutableRawPointer?
+) {
+    Task { @MainActor in
+        DisplayController.current?.handleDisplayReconfiguration(
+            displayID: displayID,
+            flags: flags
+        )
+    }
+}
+
 @MainActor
 final class DisplayController: ObservableObject {
     static weak var current: DisplayController?
@@ -31,6 +44,10 @@ final class DisplayController: ObservableObject {
     private var screenParametersObserver: NSObjectProtocol?
     private var lastConnectionAttempt: ConnectionAttempt?
     private var appliedEyeProtectionDisplayIDs: Set<CGDirectDisplayID> = []
+    private var displayReconfigurationCallbackRegistered = false
+    private var builtInSafetyRecoveryInProgress = false
+    private var builtInSafetyRecoveryRetryTask: Task<Void, Never>?
+    private var builtInSafetyRecoveryRetryCount = 0
 
     private static let autoDisconnectPreferenceKey = "autoDisconnectBuiltInDisplay"
     private static let managedDisplaysPreferenceKey = "managedDisconnectedDisplays"
@@ -52,6 +69,12 @@ final class DisplayController: ObservableObject {
         Self.current = self
         observeDisplayPowerState()
         observeDisplayConfiguration()
+        observeCoreGraphicsDisplayReconfiguration()
+        if diagnosticsMode {
+            print(
+                "Display safety recovery: \(displayReconfigurationCallbackRegistered ? "available" : "unavailable")"
+            )
+        }
         refresh()
 
         refreshTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
@@ -63,12 +86,19 @@ final class DisplayController: ObservableObject {
 
     deinit {
         refreshTimer?.invalidate()
+        builtInSafetyRecoveryRetryTask?.cancel()
         let notificationCenter = NSWorkspace.shared.notificationCenter
         for observer in powerObservers {
             notificationCenter.removeObserver(observer)
         }
         if let screenParametersObserver {
             NotificationCenter.default.removeObserver(screenParametersObserver)
+        }
+        if displayReconfigurationCallbackRegistered {
+            CGDisplayRemoveReconfigurationCallback(
+                pypyDisplayReconfigurationCallback,
+                nil
+            )
         }
     }
 
@@ -136,6 +166,15 @@ final class DisplayController: ObservableObject {
         }
 
         refreshDisplaySettings(activeIDs: activeIDs)
+
+        if activeIDs.isEmpty {
+            restoreBuiltInDisplayForSafety()
+            return
+        }
+
+        builtInSafetyRecoveryRetryTask?.cancel()
+        builtInSafetyRecoveryRetryTask = nil
+        builtInSafetyRecoveryRetryCount = 0
 
         if !autoDisconnectBuiltInDisplay,
            managedDisplays.values.contains(where: { $0.reason == .automaticBuiltIn }) {
@@ -287,9 +326,13 @@ final class DisplayController: ObservableObject {
                     reason: .manual
                 )
             } else {
-                guard display.isActive else { return }
+                let liveActiveIDs = Set(getDisplayIDs(using: CGGetActiveDisplayList))
+                guard liveActiveIDs.contains(display.id) else {
+                    refresh()
+                    return
+                }
 
-                if activeDisplayCount <= 1 {
+                if liveActiveIDs.subtracting([display.id]).isEmpty {
                     guard !display.isBuiltIn,
                           let builtInRecord = managedBuiltInDisplayRecord else {
                         throw DisplayConnectionError.refusingLastDisplay
@@ -445,6 +488,104 @@ final class DisplayController: ObservableObject {
         }
     }
 
+    private func observeCoreGraphicsDisplayReconfiguration() {
+        let result = CGDisplayRegisterReconfigurationCallback(
+            pypyDisplayReconfigurationCallback,
+            nil
+        )
+        displayReconfigurationCallbackRegistered = result == .success
+    }
+
+    fileprivate func handleDisplayReconfiguration(
+        displayID: CGDirectDisplayID,
+        flags: CGDisplayChangeSummaryFlags
+    ) {
+        if flags.contains(.beginConfigurationFlag) {
+            return
+        }
+
+        guard flags.contains(.removeFlag) ||
+              flags.contains(.disabledFlag) ||
+              flags.contains(.enabledFlag) else {
+            return
+        }
+
+        appliedEyeProtectionDisplayIDs.remove(displayID)
+        lastConnectionAttempt = nil
+        refresh()
+    }
+
+    private func restoreBuiltInDisplayForSafety() {
+        guard connectionManagementAvailable,
+              !builtInSafetyRecoveryInProgress,
+              builtInSafetyRecoveryRetryTask == nil else {
+            return
+        }
+
+        let liveActiveIDs = Set(getDisplayIDs(using: CGGetActiveDisplayList))
+        let managedRecord = managedBuiltInDisplayRecord
+        let builtInDisplayID = managedRecord?.id
+            ?? displays.first(where: { $0.isBuiltIn })?.id
+            ?? knownDisplays.values.first(where: { $0.isBuiltIn })?.id
+
+        guard let builtInDisplayID,
+              !liveActiveIDs.contains(builtInDisplayID) else {
+            return
+        }
+
+        builtInSafetyRecoveryInProgress = true
+        defer { builtInSafetyRecoveryInProgress = false }
+
+        do {
+            try applyConnectionChange(
+                displayID: builtInDisplayID,
+                enabled: true,
+                reason: managedRecord?.reason ?? .manual
+            )
+            lastConnectionAttempt = nil
+            lastError = nil
+            builtInSafetyRecoveryRetryTask?.cancel()
+            builtInSafetyRecoveryRetryTask = nil
+            builtInSafetyRecoveryRetryCount = 0
+            try? powerAPI.wakeDisplays()
+            displaysAwake = true
+            scheduleRefreshAfterConnectionChange()
+        } catch {
+            lastError = error
+            lastConnectionAttempt = nil
+            if getDisplayIDs(using: CGGetActiveDisplayList).isEmpty {
+                scheduleBuiltInSafetyRecoveryRetry()
+            }
+        }
+    }
+
+    private func scheduleBuiltInSafetyRecoveryRetry() {
+        guard builtInSafetyRecoveryRetryTask == nil else { return }
+
+        let retryDelays: [Int64] = [350, 700, 1_400, 2_500]
+        let retryDelay = retryDelays[
+            min(builtInSafetyRecoveryRetryCount, retryDelays.count - 1)
+        ]
+        builtInSafetyRecoveryRetryCount += 1
+
+        builtInSafetyRecoveryRetryTask = Task { @MainActor [weak self] in
+            do {
+                try await Task.sleep(for: .milliseconds(retryDelay))
+            } catch {
+                return
+            }
+            guard !Task.isCancelled, let self else { return }
+            self.builtInSafetyRecoveryRetryTask = nil
+
+            let liveActiveIDs = self.getDisplayIDs(using: CGGetActiveDisplayList)
+            guard liveActiveIDs.isEmpty else {
+                self.builtInSafetyRecoveryRetryCount = 0
+                return
+            }
+            self.restoreBuiltInDisplayForSafety()
+        }
+    }
+
     private func reconcileAutomaticBuiltInDisplayConnection() {
         guard autoDisconnectBuiltInDisplay, connectionManagementAvailable,
               let builtInDisplay = displays.first(where: \.isBuiltIn) else {
@@ -510,6 +651,10 @@ final class DisplayController: ObservableObject {
             scheduleRefreshAfterConnectionChange()
         } catch {
             lastError = error
+            lastConnectionAttempt = nil
+            if enabled && getDisplayIDs(using: CGGetActiveDisplayList).isEmpty {
+                scheduleBuiltInSafetyRecoveryRetry()
+            }
         }
     }
 
