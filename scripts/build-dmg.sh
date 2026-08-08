@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIRECTORY="$(cd "${SCRIPT_DIRECTORY}/.." && pwd)"
 APP_NAME="PypyDisplay"
-VERSION="0.9.2"
+VERSION="0.9.3"
 BUILD_DIRECTORY="${PROJECT_DIRECTORY}/build"
 APP_PATH="${BUILD_DIRECTORY}/${APP_NAME}.app"
 DMG_PATH="${BUILD_DIRECTORY}/${APP_NAME}-${VERSION}-arm64.dmg"

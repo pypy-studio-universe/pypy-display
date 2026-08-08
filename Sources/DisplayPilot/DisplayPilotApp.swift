@@ -39,6 +39,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             print("Display wake API: IOPMAssertionDeclareUserActivity")
             print("Apple Silicon: \(HardwareCapabilities.isAppleSilicon ? "yes" : "no")")
             print("Display connection API: \(connectionAPI.isAvailable ? "available" : "unavailable")")
+            print(
+                "Headless fallback detection: " +
+                (DisplayIdentity.isWindowServerHeadlessFallback(
+                    vendorNumber: 0x756E_6B6E,
+                    modelNumber: 0x7669_7274
+                ) ? "available" : "unavailable")
+            )
             print("Display brightness API: \(settingsAPI.brightnessAPIAvailable ? "available" : "unavailable")")
             print("Built-in True Tone: \(trueToneAPI.isAvailable ? "available" : "unavailable")")
             printDisplaySettingsDiagnostics(using: settingsAPI)
@@ -63,12 +70,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         for displayID in displayIDs.prefix(Int(displayCount)) {
             let identifier = String(format: "0x%08X", displayID)
+            let vendor = String(format: "0x%08X", CGDisplayVendorNumber(displayID))
+            let model = String(format: "0x%08X", CGDisplayModelNumber(displayID))
             let modeCount = settingsAPI.displayModes(for: displayID).count
             let brightnessSupported = (try? settingsAPI.brightness(for: displayID)) != nil
             let brightnessMethod = settingsAPI.brightnessMethod(for: displayID)?.rawValue
                 ?? "unavailable"
             print(
-                "Display \(identifier): \(modeCount) resolution modes, brightness \(brightnessSupported ? brightnessMethod : "unsupported")"
+                "Display \(identifier): vendor \(vendor), model \(model), " +
+                "headless fallback \(DisplayIdentity.isWindowServerHeadlessFallback(displayID) ? "yes" : "no"), " +
+                "\(modeCount) resolution modes, brightness \(brightnessSupported ? brightnessMethod : "unsupported")"
             )
         }
     }

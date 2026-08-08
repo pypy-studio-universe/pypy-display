@@ -115,8 +115,10 @@ final class DisplayController: ObservableObject {
     }
 
     func refresh() {
-        let onlineIDs = getDisplayIDs(using: CGGetOnlineDisplayList)
-        let activeIDs = Set(getDisplayIDs(using: CGGetActiveDisplayList))
+        let onlineIDs = getDisplayIDs(using: CGGetOnlineDisplayList).filter {
+            !DisplayIdentity.isWindowServerHeadlessFallback($0)
+        }
+        let activeIDs = userVisibleActiveDisplayIDs()
         let screenNames = currentScreenNames()
 
         for (id, name) in screenNames {
@@ -165,12 +167,12 @@ final class DisplayController: ObservableObject {
             return $0.name.localizedStandardCompare($1.name) == .orderedAscending
         }
 
-        refreshDisplaySettings(activeIDs: activeIDs)
-
         if activeIDs.isEmpty {
             restoreBuiltInDisplayForSafety()
             return
         }
+
+        refreshDisplaySettings(activeIDs: activeIDs)
 
         builtInSafetyRecoveryRetryTask?.cancel()
         builtInSafetyRecoveryRetryTask = nil
@@ -326,7 +328,7 @@ final class DisplayController: ObservableObject {
                     reason: .manual
                 )
             } else {
-                let liveActiveIDs = Set(getDisplayIDs(using: CGGetActiveDisplayList))
+                let liveActiveIDs = userVisibleActiveDisplayIDs()
                 guard liveActiveIDs.contains(display.id) else {
                     refresh()
                     return
@@ -522,7 +524,7 @@ final class DisplayController: ObservableObject {
             return
         }
 
-        let liveActiveIDs = Set(getDisplayIDs(using: CGGetActiveDisplayList))
+        let liveActiveIDs = userVisibleActiveDisplayIDs()
         let managedRecord = managedBuiltInDisplayRecord
         let builtInDisplayID = managedRecord?.id
             ?? displays.first(where: { $0.isBuiltIn })?.id
@@ -553,7 +555,7 @@ final class DisplayController: ObservableObject {
         } catch {
             lastError = error
             lastConnectionAttempt = nil
-            if getDisplayIDs(using: CGGetActiveDisplayList).isEmpty {
+            if userVisibleActiveDisplayIDs().isEmpty {
                 scheduleBuiltInSafetyRecoveryRetry()
             }
         }
@@ -577,7 +579,7 @@ final class DisplayController: ObservableObject {
             guard !Task.isCancelled, let self else { return }
             self.builtInSafetyRecoveryRetryTask = nil
 
-            let liveActiveIDs = self.getDisplayIDs(using: CGGetActiveDisplayList)
+            let liveActiveIDs = self.userVisibleActiveDisplayIDs()
             guard liveActiveIDs.isEmpty else {
                 self.builtInSafetyRecoveryRetryCount = 0
                 return
@@ -652,7 +654,7 @@ final class DisplayController: ObservableObject {
         } catch {
             lastError = error
             lastConnectionAttempt = nil
-            if enabled && getDisplayIDs(using: CGGetActiveDisplayList).isEmpty {
+            if enabled && userVisibleActiveDisplayIDs().isEmpty {
                 scheduleBuiltInSafetyRecoveryRetry()
             }
         }
@@ -774,6 +776,12 @@ final class DisplayController: ObservableObject {
         let result = getter(UInt32(ids.count), &ids, &count)
         guard result == .success else { return [] }
         return Array(ids.prefix(Int(count)))
+    }
+
+    private func userVisibleActiveDisplayIDs() -> Set<CGDirectDisplayID> {
+        Set(getDisplayIDs(using: CGGetActiveDisplayList).filter {
+            !DisplayIdentity.isWindowServerHeadlessFallback($0)
+        })
     }
 
     private func currentScreenNames() -> [CGDirectDisplayID: String] {
